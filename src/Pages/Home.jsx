@@ -1,6 +1,7 @@
 import React from 'react';
 import { getProductsFromCategoryAndQuery } from '../services/api';
-
+import CategoryList from './CategoryList';
+import ShoppingCartButton from '../components/ShoppingCartButton';
 class Home extends React.Component {
   state = {
     homeInput: '',
@@ -8,6 +9,10 @@ class Home extends React.Component {
     filteredProducts: [],
     produtcsAlert: false,
     validata: false,
+  }
+
+  componentDidMount() {
+    console.log('teste');
   }
 
   validate = ({ target }) => {
@@ -78,7 +83,6 @@ class Home extends React.Component {
         </label>
         { !renderAlert
         && <p data-testid="home-initial-message">{ text }</p>}
-
         {validata && (<p> Nenhum produto foi encontrado </p>)}
 
         {produtcsAlert && (results.map((products) => (
@@ -94,6 +98,8 @@ class Home extends React.Component {
             <p>{products.price}</p>
           </div>
         ))) }
+        <ShoppingCartButton />
+        <CategoryList />
       </div>
     );
   }

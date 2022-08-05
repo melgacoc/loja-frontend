@@ -1,16 +1,21 @@
 import React from 'react';
 import CategoryList from './CategoryList';
 import ShoppingCartButton from '../components/ShoppingCartButton';
-
+import { getCategories } from '../services/api';
 
 class Home extends React.Component {
   state = {
     homeInput: '',
     renderAlert: false,
+    categories: [],
   }
 
-  componentDidMount() {
-    console.log('teste');
+  async componentDidMount() {
+    const categoriesObject = await getCategories();
+    /* categories.push(categoriesObject); */
+    this.setState({
+      categories: [categoriesObject],
+    });
   }
 
   validate = ({ target }) => {
@@ -28,7 +33,7 @@ class Home extends React.Component {
   }
 
   render() {
-    const { homeInput, renderAlert } = this.state;
+    const { homeInput, renderAlert, categories } = this.state;
     const text = 'Digite algum termo de pesquisa ou escolha uma categoria.';
     return (
       <div>
@@ -44,7 +49,14 @@ class Home extends React.Component {
         { !renderAlert
         && <p data-testid="home-initial-message">{ text }</p>}
         <ShoppingCartButton />
-        <CategoryList />
+        {
+          categories.forEach((category) => (
+            <CategoryList
+              key={ category.id }
+              categoryItems={ category.name }
+            />
+          ))
+        }
       </div>
     );
   }

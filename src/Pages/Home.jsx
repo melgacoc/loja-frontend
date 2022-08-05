@@ -1,5 +1,7 @@
 import React from 'react';
 import CategoryList from './CategoryList';
+import ShoppingCartButton from '../components/ShoppingCartButton';
+
 
 class Home extends React.Component {
   state = {
@@ -41,6 +43,7 @@ class Home extends React.Component {
         </label>
         { !renderAlert
         && <p data-testid="home-initial-message">{ text }</p>}
+        <ShoppingCartButton />
         <CategoryList />
       </div>
     );

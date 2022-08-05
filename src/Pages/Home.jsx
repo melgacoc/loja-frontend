@@ -1,9 +1,14 @@
 import React from 'react';
+import CategoryList from './CategoryList';
 
 class Home extends React.Component {
   state = {
     homeInput: '',
     renderAlert: false,
+  }
+
+  componentDidMount() {
+    console.log('teste');
   }
 
   validate = ({ target }) => {
@@ -36,6 +41,7 @@ class Home extends React.Component {
         </label>
         { !renderAlert
         && <p data-testid="home-initial-message">{ text }</p>}
+        <CategoryList />
       </div>
     );
   }

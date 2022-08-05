@@ -7,6 +7,7 @@ class Home extends React.Component {
     renderAlert: false,
     filteredProducts: [],
     produtcsAlert: false,
+    validata: false,
   }
 
   validate = ({ target }) => {
@@ -33,8 +34,9 @@ class Home extends React.Component {
       return (
         this.setState({
           produtcsAlert: false,
-          renderAlert: false,
+          renderAlert: true,
           homeInput: '',
+          validata: true,
         })
       );
     }
@@ -42,12 +44,13 @@ class Home extends React.Component {
       filteredProducts: response,
       produtcsAlert: true,
       homeInput: '',
-      renderAlert: false,
+      renderAlert: true,
     });
   }
 
   render() {
-    const { homeInput, renderAlert, filteredProducts, produtcsAlert } = this.state;
+    const { homeInput, renderAlert, filteredProducts,
+      produtcsAlert, validata } = this.state;
     const text = 'Digite algum termo de pesquisa ou escolha uma categoria.';
     const { results } = filteredProducts;
 
@@ -76,20 +79,21 @@ class Home extends React.Component {
         { !renderAlert
         && <p data-testid="home-initial-message">{ text }</p>}
 
-        {produtcsAlert ? (results.map((products) => (
+        {validata && (<p> Nenhum produto foi encontrado </p>)}
+
+        {produtcsAlert && (results.map((products) => (
           <div
             key={ products.id }
+            data-testid="product"
           >
-            <p data-testid="product">{products.title}</p>
+            <p>{products.title}</p>
             <img
-              data-testid="product"
               src={ products.thumbnail }
               alt={ products.title }
             />
-            <p data-testid="product">{products.price}</p>
+            <p>{products.price}</p>
           </div>
-        ))) : (<p> Nenhum produto foi encontrado </p>) }
-
+        ))) }
       </div>
     );
   }

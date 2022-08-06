@@ -1,20 +1,13 @@
 import React from 'react';
 import { BrowserRouter, Route, Switch } from 'react-router-dom';
 import Home from './Pages/Home';
-import CategoryList from './Pages/CategoryList';
 import ShoppingCart from './Pages/ShoppingCart';
-
 
 class App extends React.Component {
   render() {
     return (
       <BrowserRouter>
         <Switch>
-          <CategoryList
-            exact
-            path="/"
-            component={ CategoryList }
-          />
           <Route
             exact
             path="/"

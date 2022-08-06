@@ -1,18 +1,23 @@
 import React from 'react';
-import { getProductsFromCategoryAndQuery } from '../services/api';
+import { getProductsFromCategoryAndQuery, getCategories } from '../services/api';
 import CategoryList from './CategoryList';
 import ShoppingCartButton from '../components/ShoppingCartButton';
+
 class Home extends React.Component {
   state = {
     homeInput: '',
     renderAlert: false,
+    categories: [],
     filteredProducts: [],
     produtcsAlert: false,
     validata: false,
   }
 
-  componentDidMount() {
-    console.log('teste');
+  async componentDidMount() {
+    const categoriesObject = await getCategories();
+    this.setState({
+      categories: [...categoriesObject],
+    });
   }
 
   validate = ({ target }) => {
@@ -54,6 +59,7 @@ class Home extends React.Component {
   }
 
   render() {
+    const { homeInput, renderAlert, categories } = this.state;
     const { homeInput, renderAlert, filteredProducts,
       produtcsAlert, validata } = this.state;
     const text = 'Digite algum termo de pesquisa ou escolha uma categoria.';
@@ -99,7 +105,16 @@ class Home extends React.Component {
           </div>
         ))) }
         <ShoppingCartButton />
-        <CategoryList />
+        {
+          categories.map((category) => {
+            const categoryItem = (
+              <CategoryList
+                key={ category.id }
+                categoryItems={ category.name }
+              />);
+            return categoryItem;
+          })
+        }
       </div>
     );
   }

@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import ShoppingCartButton from '../components/ShoppingCartButton';
 import { getCategories, getProductsFromCategoryAndQuery } from '../services/api';
 import CategoryList from './CategoryList';
@@ -78,7 +79,12 @@ class Home extends React.Component {
               <div data-testid="product" key={ id }>
                 <p>{ `${title} - R$ ${price}` }</p>
                 <div>
-                  <img src={ thumbnail } alt={ title } />
+                  <Link
+                    data-testid="product-detail-link"
+                    to={ `/product-detail/${id}` }
+                  >
+                    <img src={ thumbnail } alt={ title } />
+                  </Link>
                   <p>Especificações Téccnicas</p>
                 </div>
               </div>

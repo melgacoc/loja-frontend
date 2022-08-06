@@ -1,7 +1,7 @@
 import React from 'react';
-import { getProductsFromCategoryAndQuery, getCategories } from '../services/api';
-import CategoryList from './CategoryList';
 import ShoppingCartButton from '../components/ShoppingCartButton';
+import { getCategories, getProductsFromCategoryAndQuery } from '../services/api';
+import CategoryList from './CategoryList';
 
 class Home extends React.Component {
   state = {
@@ -11,6 +11,8 @@ class Home extends React.Component {
     filteredProducts: [],
     produtcsAlert: false,
     validata: false,
+    renderProductDetails: false,
+    productDetails: [],
   }
 
   async componentDidMount() {
@@ -37,10 +39,7 @@ class Home extends React.Component {
   searchProduct = async () => {
     const { homeInput } = this.state;
     const response = await getProductsFromCategoryAndQuery(homeInput, homeInput);
-    console.log('test');
-    console.log(response);
     if (response.results.length === 0) {
-      console.log('test');
       return (
         this.setState({
           produtcsAlert: false,
@@ -58,10 +57,42 @@ class Home extends React.Component {
     });
   }
 
+  requestProductDetails = async (event) => {
+    const id = event.target.getAttribute('data-key');
+    const response = await getProductsFromCategoryAndQuery(id, id);
+    const results = await response.results;
+    this.setState({
+      renderProductDetails: true,
+      productDetails: results,
+    });
+  }
+
+  renderProductDetails = () => {
+    const { productDetails } = this.state;
+    if (productDetails.length > 0) {
+      return (
+        <div>
+          {productDetails.map((product) => {
+            const { id, title, price, thumbnail } = product;
+            return (
+              <div data-testid="product" key={ id }>
+                <p>{ `${title} - R$ ${price}` }</p>
+                <div>
+                  <img src={ thumbnail } alt={ title } />
+                  <p>Especificações Téccnicas</p>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      );
+    }
+  }
+
   render() {
-    const { homeInput, renderAlert, categories } = this.state;
     const { homeInput, renderAlert, filteredProducts,
-      produtcsAlert, validata } = this.state;
+      produtcsAlert, validata,
+      categories, renderProductDetails } = this.state;
     const text = 'Digite algum termo de pesquisa ou escolha uma categoria.';
     const { results } = filteredProducts;
 
@@ -111,10 +142,13 @@ class Home extends React.Component {
               <CategoryList
                 key={ category.id }
                 categoryItems={ category.name }
+                categoryId={ category.id }
+                requestProductDetails={ this.requestProductDetails }
               />);
             return categoryItem;
           })
         }
+        { renderProductDetails && this.renderProductDetails() }
       </div>
     );
   }

@@ -1,15 +1,17 @@
-import React from 'react';
 import PropTypes from 'prop-types';
+import React from 'react';
 
 class CategoryList extends React.Component {
   render() {
-    const { categoryItems } = this.props;
+    const { categoryItems, categoryId, requestProductDetails } = this.props;
 
     return (
       <div>
         <button
           type="button"
           data-testid="category"
+          data-key={ categoryId }
+          onClick={ requestProductDetails }
         >
           { categoryItems }
         </button>
@@ -21,6 +23,8 @@ class CategoryList extends React.Component {
 
 CategoryList.propTypes = {
   categoryItems: PropTypes.string.isRequired,
+  categoryId: PropTypes.string.isRequired,
+  requestProductDetails: PropTypes.func.isRequired,
 };
 
 export default CategoryList;

@@ -6,7 +6,15 @@ class CategoryList extends React.Component {
     const { categoryItems } = this.props;
 
     return (
-      <button type="button" data-testid="category">{ categoryItems }</button>
+      <div>
+        <button
+          type="button"
+          data-testid="category"
+        >
+          { categoryItems }
+        </button>
+        <br />
+      </div>
     );
   }
 }

@@ -12,9 +12,8 @@ class Home extends React.Component {
 
   async componentDidMount() {
     const categoriesObject = await getCategories();
-    /* categories.push(categoriesObject); */
     this.setState({
-      categories: [categoriesObject],
+      categories: [...categoriesObject],
     });
   }
 
@@ -50,12 +49,14 @@ class Home extends React.Component {
         && <p data-testid="home-initial-message">{ text }</p>}
         <ShoppingCartButton />
         {
-          categories.forEach((category) => (
-            <CategoryList
-              key={ category.id }
-              categoryItems={ category.name }
-            />
-          ))
+          categories.map((category) => {
+            const categoryItem = (
+              <CategoryList
+                key={ category.id }
+                categoryItems={ category.name }
+              />);
+            return categoryItem;
+          })
         }
       </div>
     );

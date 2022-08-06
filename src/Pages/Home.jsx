@@ -1,7 +1,7 @@
 import React from 'react';
-import { getProductsFromCategoryAndQuery, getCategories } from '../services/api';
-import CategoryList from './CategoryList';
 import ShoppingCartButton from '../components/ShoppingCartButton';
+import { getCategories, getProductsFromCategoryAndQuery } from '../services/api';
+import CategoryList from './CategoryList';
 
 class Home extends React.Component {
   state = {
@@ -59,9 +59,8 @@ class Home extends React.Component {
   }
 
   render() {
-    const { homeInput, renderAlert, categories } = this.state;
     const { homeInput, renderAlert, filteredProducts,
-      produtcsAlert, validata } = this.state;
+      produtcsAlert, validata, categories } = this.state;
     const text = 'Digite algum termo de pesquisa ou escolha uma categoria.';
     const { results } = filteredProducts;
 

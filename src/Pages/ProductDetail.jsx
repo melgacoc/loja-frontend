@@ -5,6 +5,7 @@ import ShoppingCartButton from '../components/ShoppingCartButton';
 class ProductDetail extends React.Component {
   state = {
     requestedProduct: [],
+    shoppingCartProducts: [],
   }
 
   async componentDidMount() {
@@ -12,13 +13,28 @@ class ProductDetail extends React.Component {
     const url = `https://api.mercadolibre.com/items/${id}`;
     const response = await fetch(url);
     const requestedProduct = await response.json();
+    const recovered = JSON.parse(localStorage.getItem('dataProducts'));
     this.setState({
       requestedProduct,
+      shoppingCartProducts: recovered,
     });
   }
 
+  componentWillUnmount() {
+    const { shoppingCartProducts } = this.state;
+    localStorage.setItem('dataProducts', JSON.stringify(shoppingCartProducts));
+  }
+
+  onClickAddButton = () => {
+    const { shoppingCartProducts, requestedProduct } = this.state;
+    this.setState({
+      shoppingCartProducts: [...shoppingCartProducts, requestedProduct],
+    });
+    console.log('teste');
+  }
+
   render() {
-    const { requestedProduct: { title, price, thumbnail } } = this.state;
+    const { requestedProduct: { title, price, thumbnail, id } } = this.state;
     return (
       <div>
         <ShoppingCartButton />
@@ -35,6 +51,14 @@ class ProductDetail extends React.Component {
               alt={ title }
             />
           </div>
+          <button
+            data-testid="product-detail-add-to-cart"
+            type="button"
+            data-key={ id }
+            onClick={ this.onClickAddButton }
+          >
+            Adidionar ao Carrinho
+          </button>
         </div>
       </div>
     );

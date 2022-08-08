@@ -39,8 +39,43 @@ class ShoppingCart extends React.Component {
     });
   }
 
+  decrease = ({ target }) => {
+    const { shoppingCartProducts } = this.state;
+    const productId = target.getAttribute('data-key');
+    shoppingCartProducts.forEach((product) => {
+      if (product.id === productId && product.amount > 1) product.amount -= 1;
+    });
+    this.setState({
+      shoppingCartProducts,
+    });
+  }
+
+  increase = ({ target }) => {
+    const { shoppingCartProducts } = this.state;
+    const productId = target.getAttribute('data-key');
+    shoppingCartProducts.forEach((product) => {
+      if (product.id === productId)product.amount += 1;
+    });
+    this.setState({
+      shoppingCartProducts,
+    });
+  }
+
+  deleteCartITem = ({ target }) => {
+    let { shoppingCartProducts } = this.state;
+    const productId = target.getAttribute('data-key');
+    shoppingCartProducts = shoppingCartProducts.filter((product) => {
+      const newCart = product.id !== productId;
+      return newCart;
+    });
+    this.setState({
+      shoppingCartProducts,
+    });
+  }
+
   render() {
     const { isEmpty, shoppingCartProducts } = this.state;
+
     return (
       <div>
         {isEmpty ? (
@@ -56,7 +91,31 @@ class ShoppingCart extends React.Component {
                     alt={ title }
                   />
                   <p data-testid="shopping-cart-product-name">{ title }</p>
+                  <button
+                    data-key={ id }
+                    type="button"
+                    data-testid="product-decrease-quantity"
+                    onClick={ this.decrease }
+                  >
+                    -
+                  </button>
                   <p data-testid="shopping-cart-product-quantity">{ amount }</p>
+                  <button
+                    data-key={ id }
+                    type="button"
+                    data-testid="product-increase-quantity"
+                    onClick={ this.increase }
+                  >
+                    +
+                  </button>
+                  <button
+                    data-key={ id }
+                    type="button"
+                    data-testid="remove-product"
+                    onClick={ this.deleteCartITem }
+                  >
+                    Remover item
+                  </button>
                 </div>
               );
             })}

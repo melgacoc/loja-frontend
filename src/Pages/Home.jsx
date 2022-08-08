@@ -1,5 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import AddProductButton from '../components/AddProductButton';
 import ShoppingCartButton from '../components/ShoppingCartButton';
 import { getCategories, getProductsFromCategoryAndQuery } from '../services/api';
 import CategoryList from './CategoryList';
@@ -9,18 +10,26 @@ class Home extends React.Component {
     homeInput: '',
     renderAlert: false,
     categories: [],
-    filteredProducts: [],
     produtcsAlert: false,
-    validata: false,
+    validate: false,
     renderProductDetails: false,
     productDetails: [],
+    shoppingCartProducts: [],
   }
 
   async componentDidMount() {
     const categoriesObject = await getCategories();
-    this.setState({
-      categories: [...categoriesObject],
+    const recovered = JSON.parse(localStorage.getItem('dataProducts'));
+    this.setState({ categories: [...categoriesObject] }, () => {
+      if (recovered !== null) {
+        this.setState({ shoppingCartProducts: recovered });
+      }
     });
+  }
+
+  componentWillUnmount() {
+    const { shoppingCartProducts } = this.state;
+    localStorage.setItem('dataProducts', JSON.stringify(shoppingCartProducts));
   }
 
   validate = ({ target }) => {
@@ -46,15 +55,15 @@ class Home extends React.Component {
           produtcsAlert: false,
           renderAlert: true,
           homeInput: '',
-          validata: true,
+          validate: true,
         })
       );
     }
     this.setState({
-      filteredProducts: response,
       produtcsAlert: true,
       homeInput: '',
       renderAlert: true,
+      productDetails: response.results,
     });
   }
 
@@ -65,6 +74,15 @@ class Home extends React.Component {
     this.setState({
       renderProductDetails: true,
       productDetails: results,
+    });
+  }
+
+  onClickAddButton = (event) => {
+    const { productDetails, shoppingCartProducts } = this.state;
+    const id = event.target.getAttribute('data-key');
+    const addedProduct = productDetails.find((product) => product.id === id);
+    this.setState({
+      shoppingCartProducts: [...shoppingCartProducts, addedProduct],
     });
   }
 
@@ -85,7 +103,13 @@ class Home extends React.Component {
                   >
                     <img src={ thumbnail } alt={ title } />
                   </Link>
-                  <p>Especificações Téccnicas</p>
+                  <p>Especificações Técnicas</p>
+                </div>
+                <div>
+                  <AddProductButton
+                    dataKey={ id }
+                    onClickAddButton={ this.onClickAddButton }
+                  />
                 </div>
               </div>
             );
@@ -96,11 +120,10 @@ class Home extends React.Component {
   }
 
   render() {
-    const { homeInput, renderAlert, filteredProducts,
-      produtcsAlert, validata,
+    const { homeInput, renderAlert, productDetails,
+      produtcsAlert, validate,
       categories, renderProductDetails } = this.state;
     const text = 'Digite algum termo de pesquisa ou escolha uma categoria.';
-    const { results } = filteredProducts;
 
     return (
       <div>
@@ -118,7 +141,6 @@ class Home extends React.Component {
             name="Pesquisar"
             value="Pesquisar"
             type="button"
-            // disabled={ buttonDisable }
             onClick={ this.searchProduct }
           >
             Pesquisar
@@ -126,9 +148,9 @@ class Home extends React.Component {
         </label>
         { !renderAlert
         && <p data-testid="home-initial-message">{ text }</p>}
-        {validata && (<p> Nenhum produto foi encontrado </p>)}
+        {validate && (<p> Nenhum produto foi encontrado </p>)}
 
-        {produtcsAlert && (results.map((products) => (
+        {produtcsAlert && (productDetails.map((products) => (
           <div
             key={ products.id }
             data-testid="product"
@@ -139,6 +161,12 @@ class Home extends React.Component {
               alt={ products.title }
             />
             <p>{products.price}</p>
+            <div>
+              <AddProductButton
+                dataKey={ products.id }
+                onClickAddButton={ this.onClickAddButton }
+              />
+            </div>
           </div>
         ))) }
         <ShoppingCartButton />

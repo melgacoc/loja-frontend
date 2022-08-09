@@ -103,6 +103,8 @@ class Home extends React.Component {
                   >
                     <img src={ thumbnail } alt={ title } />
                   </Link>
+                  {product.shipping.free_shipping
+            && <p data-testid="free-shipping"> Frete grátis</p>}
                   <p>Especificações Técnicas</p>
                 </div>
                 <div>
@@ -156,10 +158,14 @@ class Home extends React.Component {
             data-testid="product"
           >
             <p>{products.title}</p>
-            <img
-              src={ products.thumbnail }
-              alt={ products.title }
-            />
+            <Link
+              data-testid="product-detail-link"
+              to={ `/product-detail/${products.id}` }
+            >
+              <img src={ products.thumbnail } alt={ products.title } />
+            </Link>
+            {products.shipping.free_shipping
+            && <p data-testid="free-shipping"> Frete grátis</p>}
             <p>{products.price}</p>
             <div>
               <AddProductButton

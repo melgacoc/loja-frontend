@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 
 class ShoppingCart extends React.Component {
   state = {
@@ -39,26 +40,36 @@ class ShoppingCart extends React.Component {
     });
   }
 
+  componentWillUnmount() {
+    const { shoppingCartProducts } = this.state;
+    localStorage.setItem('dataProducts', JSON.stringify(shoppingCartProducts));
+  }
+
+  saveOnStorage = () => {
+    const { shoppingCartProducts } = this.state;
+    localStorage.setItem('dataProducts', JSON.stringify(shoppingCartProducts));
+  }
+
   decrease = ({ target }) => {
     const { shoppingCartProducts } = this.state;
     const productId = target.getAttribute('data-key');
     shoppingCartProducts.forEach((product) => {
       if (product.id === productId && product.amount > 1) product.amount -= 1;
     });
-    this.setState({
-      shoppingCartProducts,
-    });
+    this.setState({ shoppingCartProducts }, this.saveOnStorage);
   }
 
   increase = ({ target }) => {
     const { shoppingCartProducts } = this.state;
     const productId = target.getAttribute('data-key');
+    const availableQuantity = shoppingCartProducts
+      .find((element) => element.id === productId).available_quantity;
     shoppingCartProducts.forEach((product) => {
-      if (product.id === productId)product.amount += 1;
+      if (product.id === productId && product.amount < availableQuantity) {
+        product.amount += 1;
+      }
     });
-    this.setState({
-      shoppingCartProducts,
-    });
+    this.setState({ shoppingCartProducts }, this.saveOnStorage);
   }
 
   deleteCartITem = ({ target }) => {
@@ -68,8 +79,10 @@ class ShoppingCart extends React.Component {
       const newCart = product.id !== productId;
       return newCart;
     });
-    this.setState({
-      shoppingCartProducts,
+    this.setState({ shoppingCartProducts }, () => {
+      if (shoppingCartProducts.length === 0) {
+        this.setState({ isEmpty: true }, this.saveOnStorage);
+      }
     });
   }
 
@@ -121,6 +134,14 @@ class ShoppingCart extends React.Component {
             })}
           </div>
         )}
+        <div>
+          <button
+            type="button"
+          >
+            <Link data-testid="checkout-products" to="/checkout">Finalizar</Link>
+
+          </button>
+        </div>
       </div>
     );
   }

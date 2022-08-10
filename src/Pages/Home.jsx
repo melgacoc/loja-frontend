@@ -22,7 +22,9 @@ class Home extends React.Component {
     const recovered = JSON.parse(localStorage.getItem('dataProducts'));
     this.setState({ categories: [...categoriesObject] }, () => {
       if (recovered !== null) {
-        this.setState({ shoppingCartProducts: recovered });
+        this.setState({
+          shoppingCartProducts: recovered,
+        });
       }
     });
   }
@@ -30,6 +32,21 @@ class Home extends React.Component {
   componentWillUnmount() {
     const { shoppingCartProducts } = this.state;
     localStorage.setItem('dataProducts', JSON.stringify(shoppingCartProducts));
+  }
+
+  productCounter = () => {
+    const { shoppingCartProducts } = this.state;
+    const withoutAmount = shoppingCartProducts.filter((e) => !e.amount).length;
+    const size = withoutAmount;
+    const recovered = JSON.parse(localStorage.getItem('dataProducts'));
+    let counter = 0;
+    if (recovered !== null) {
+      recovered.forEach((element) => {
+        counter += element.amount;
+      });
+    }
+    counter += size;
+    return (<p data-testid="shopping-cart-size">{ counter }</p>);
   }
 
   validate = ({ target }) => {
@@ -126,7 +143,6 @@ class Home extends React.Component {
       produtcsAlert, validate,
       categories, renderProductDetails } = this.state;
     const text = 'Digite algum termo de pesquisa ou escolha uma categoria.';
-
     return (
       <div>
         <label htmlFor="home-search-input">
@@ -176,6 +192,9 @@ class Home extends React.Component {
           </div>
         ))) }
         <ShoppingCartButton />
+        <div>
+          {this.productCounter()}
+        </div>
         {
           categories.map((category) => {
             const categoryItem = (

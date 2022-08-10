@@ -5,12 +5,13 @@ class ProductEvaluation extends React.Component {
     email: '',
     note: '',
     message: '',
-    isSendButtonDisabled: true,
+    invalid: false,
     avaliations: [],
   }
 
   componentDidMount() {
-    const messageRecovered = JSON.parse(localStorage.getItem('avaliations'));
+    const id = window.location.pathname.split('/')[2];
+    const messageRecovered = JSON.parse(localStorage.getItem(`${id}`));
     if (messageRecovered !== null) {
       this.setState({
         avaliations: messageRecovered,
@@ -20,51 +21,43 @@ class ProductEvaluation extends React.Component {
 
   onInputChange = ({ target }) => {
     const { name, value } = target;
-    this.setState({ [name]: value }, this.validateSendbutton);
-  }
-
-  validateSendbutton = () => {
-    const { email, note } = this.state;
-    const validate = [
-      email.length > 0,
-      email.includes('@'),
-      email.includes('.com'),
-      note.length === 1,
-    ].every(Boolean);
-    this.setState({
-      isSendButtonDisabled: !validate,
-    });
+    this.setState({ [name]: value });
   }
 
   sendAvaliation = (event) => {
     event.preventDefault();
-    const id = window.location.pathname.split('/')[2];
     const { email, note, message, avaliations } = this.state;
-    const avaliation = {
-      email,
-      note,
-      message,
-      id,
-    };
-    this.setState({ avaliations: [...avaliations, avaliation] }, this.setInputs);
+    const emailRegex = /^[a-z0-9.]+@[a-z0-9]+\.[a-z]+/g;
+    const validEmail = emailRegex.test(email);
+    if (validEmail && note) {
+      const avaliation = {
+        email,
+        note,
+        message,
+      };
+      this.setState({
+        avaliations: [...avaliations, avaliation],
+        invalid: false,
+      }, this.setInputs);
+    } else {
+      this.setState({ invalid: true });
+    }
   }
 
   setInputs = () => {
     const { avaliations } = this.state;
-    localStorage.setItem('avaliations', JSON.stringify(avaliations));
+    const id = window.location.pathname.split('/')[2];
+    localStorage.setItem(`${id}`, JSON.stringify(avaliations));
     this.setState({
       email: '',
       note: '',
       message: '',
-      isSendButtonDisabled: true,
     });
   }
 
   renderMessages = () => {
     const { avaliations } = this.state;
-    const id = window.location.pathname.split('/')[2];
-    const avaliation = avaliations.filter((element) => element.id === id);
-    return (avaliation.map((element, index) => (
+    return (avaliations.map((element, index) => (
       <div key={ index }>
         <p data-testid="review-card-email">{element.email}</p>
         <p data-testid="review-card-rating">{element.note}</p>
@@ -75,7 +68,8 @@ class ProductEvaluation extends React.Component {
   }
 
   render() {
-    const { email, note, message, isSendButtonDisabled } = this.state;
+    const { email, note, message, invalid } = this.state;
+    const ratings = ['1', '2', '3', '4', '5'];
     return (
       <form>
         <div>
@@ -92,52 +86,26 @@ class ProductEvaluation extends React.Component {
           </label>
         </div>
         <div>
-          <label htmlFor="note">
-            <select
-              name="note"
-              id="note"
-              value={ note }
-              onChange={ this.onInputChange }
-            >
-              <option
-                data-testid="1-rating"
-                value="1"
-              >
-                1
-              </option>
-              <option
-                data-testid="2-rating"
-                value="2"
-              >
-                2
-              </option>
-              <option
-                data-testid="3-rating"
-                value="3"
-              >
-                3
-              </option>
-              <option
-                data-testid="4-rating"
-                value="4"
-              >
-                4
-              </option>
-              <option
-                data-testid="5-rating"
-                value="5"
-              >
-                5
-              </option>
-            </select>
-          </label>
+          <div>
+            {ratings.map((input, index) => (
+              <input
+                data-testid={ `${input}-rating` }
+                key={ index }
+                type="radio"
+                name="note"
+                value={ input }
+                checked={ note === input }
+                onChange={ this.onInputChange }
+              />
+            ))}
+          </div>
         </div>
         <div>
           <label
             htmlFor="message"
-            data-testid="product-detail-evaluation"
           >
             <textarea
+              data-testid="product-detail-evaluation"
               placeholder="Messagem (opcional)"
               name="message"
               id="message"
@@ -153,11 +121,10 @@ class ProductEvaluation extends React.Component {
             data-testid="submit-review-btn"
             type="submit"
             onClick={ this.sendAvaliation }
-            disabled={ isSendButtonDisabled }
           >
             Avaliar
           </button>
-          {isSendButtonDisabled && <p data-testid="error-msg">Campos inválidos.</p>}
+          {invalid && (<p data-testid="error-msg">Campos inválidos</p>)}
         </div>
         <div>
           {this.renderMessages()}

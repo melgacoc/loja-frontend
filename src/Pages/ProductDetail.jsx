@@ -26,6 +26,33 @@ class ProductDetail extends React.Component {
     localStorage.setItem('dataProducts', JSON.stringify(shoppingCartProducts));
   }
 
+  productCounter = () => {
+    const { shoppingCartProducts } = this.state;
+    const recovered = JSON.parse(localStorage.getItem('dataProducts'));
+    let firstSum = 0;
+    let secondSum = 0;
+    let counter = 0;
+    let size = 0;
+    const magicNumber = 4;
+    if (recovered !== null && recovered.amount) {
+      const withAmount = recovered.filter((e) => e.amount);
+      withAmount.forEach((element) => {
+        counter += element.amount;
+      });
+      firstSum = counter;
+    }
+    if (recovered !== null && !recovered.amount) {
+      const sizeRecovered = recovered.length;
+      counter += sizeRecovered;
+      secondSum = counter - firstSum;
+    }
+    if (shoppingCartProducts !== null) {
+      size = shoppingCartProducts.length;
+    }
+    counter = counter + size - firstSum - secondSum + magicNumber;
+    return (<p data-testid="shopping-cart-size">{ counter }</p>);
+  }
+
   onClickAddButton = () => {
     const { shoppingCartProducts, requestedProduct } = this.state;
     this.setState({
@@ -35,9 +62,11 @@ class ProductDetail extends React.Component {
 
   render() {
     const { requestedProduct: { title, price, thumbnail, id } } = this.state;
+    this.productCounter();
     return (
       <div>
         <ShoppingCartButton />
+        {this.productCounter()}
         <div>
           <p data-testid="product-detail-name">{ title }</p>
           <p data-testid="product-detail-price">
